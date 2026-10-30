@@ -10,7 +10,7 @@ This demo uses **OrderAI**, a fictional AI order-processing platform, and two fi
 
 Click **Replay batch**. Start with four empty quadrants: customer orders above, billing events below.
 
-> “We charge when an order is accepted by the ERP without human intervention. As the business grows, customers negotiate different rates and prepaid agreements. Counting outcomes is only the first part; contracts determine what those outcomes cost.”
+We charge when an order is accepted by the ERP without human intervention. As the business grows, customers negotiate different rates and prepaid agreements. Counting outcomes is only the first part; contracts determine what those outcomes cost.
 
 The application defines success and sends qualifying events. Metronome counts and prices them; it doesn't judge the AI's work.
 
@@ -35,7 +35,7 @@ All demo prices are **USD**:
 
 Show Coastal's **20% discount through 28 October 2027**, then the commitment's **eligible product, access dates and remaining balance**. Earlier tests may already have consumed the credit.
 
-> “The event doesn't contain a price. The customer's contract determines the charge.”
+The event doesn't contain a price. The customer's contract determines the charge.
 
 ![Coastal's platform subscription and fully consumed $1 prepaid commitment in Metronome](docs/images/coastal-contract.png)
 
@@ -58,7 +58,7 @@ Open both customers' usage and current draft invoices. Allow time for processing
 - Show prepaid consumption on Coastal, and overage once the balance is exhausted.
 - Compare platform fees separately: Coastal started partway through October, so that month's platform fee is prorated.
 
-> “The outcome counts are comparable. The charges differ because the agreements differ.”
+The outcome counts are comparable. The charges differ because the agreements differ.
 
 Use the draft calculation now; final billing follows the billing schedule. A draft is not evidence of payment.
 
