@@ -1,0 +1,12 @@
+{
+  "name": "orderai-outcome-billing-demo",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Two fictional customers, the same outcomes, different Metronome contracts",
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "start": "node --env-file-if-exists=.env server.mjs",
+    "test": "node --test test/*.test.mjs"
+  }
+}

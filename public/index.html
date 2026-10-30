@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>OrderAI · Orders to outcomes</title>
+  <link rel="stylesheet" href="/style.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <main>
+    <div id="panels" class="panels"></div>
+    <div class="toolbar">
+      <span class="demo-label">Fictional demo · simulated orders · USD</span>
+      <label><span class="sr-only">Connection</span><select id="mode"><option value="fixture">Offline rehearsal</option><option value="live">Metronome sandbox</option></select></label>
+      <span id="mode-note" class="sr-only" role="status">Loading…</span>
+      <p id="notice" role="alert"></p>
+      <div class="controls"><button id="verify">Check counts</button><button id="replay">Replay batch</button><button id="run" class="primary" disabled>Run order batch</button></div>
+    </div>
+  </main>
+  <noscript>Enable JavaScript to run the order demo.</noscript>
+</body>
+</html>
