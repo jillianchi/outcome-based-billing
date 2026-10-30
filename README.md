@@ -14,6 +14,8 @@ Click **Replay batch**. Start with four empty quadrants: customer orders above, 
 
 The application defines success and sends qualifying events. Metronome counts and prices them; it doesn't judge the AI's work.
 
+![Empty demo: customer orders above, outcome events below](docs/images/demo-empty.png)
+
 ### 2. Metronome — show the contracts
 
 Open **https://app.metronome.com/** and walk through the prepared setup:
@@ -28,12 +30,14 @@ All demo prices are **USD**:
 | --- | --- | --- |
 | Monthly platform, in arrears | $50 | $50 |
 | Included outcomes per month | First 2 | First 2 |
-| Subsequent outcomes | $0.15 each | $0.12 each |
+| Subsequent outcomes | $0.15 each | 20% off standard ($0.12 each) |
 | Outcome-only prepaid balance | None | $1 purchased upfront |
 
 Show Coastal's **20% discount through 28 October 2027**, then the commitment's **eligible product, access dates and remaining balance**. Earlier tests may already have consumed the credit.
 
 > “The event doesn't contain a price. The customer's contract determines the charge.”
+
+![Coastal's platform subscription and fully consumed $1 prepaid commitment in Metronome](docs/images/coastal-contract.png)
 
 ### 3. Local UI — run the orders
 
@@ -43,18 +47,24 @@ Each customer processes ten different orders, with matching results per line: **
 
 **Offline rehearsal** runs the same sequence without sending events. Order processing itself is simulated in both modes.
 
+![Completed batch: six successful outcomes and four excluded orders per customer, with billing events below](docs/images/demo-complete.png)
+
 ### 4. Metronome — compare usage and draft invoices
 
 Open both customers' usage and current draft invoices. Allow time for processing, then refresh.
 
 - Compare outcome counts for the same period; monthly totals include earlier tests.
-- Compare the outcome rates after the included allowance: **$0.15 versus $0.12**.
+- Compare the outcome rates after the included allowance: **standard $0.15 versus Coastal's 20% discount ($0.12)**.
 - Show prepaid consumption on Coastal, and overage once the balance is exhausted.
 - Compare platform fees separately: Coastal started partway through October, so that month's platform fee is prorated.
 
 > “The outcome counts are comparable. The charges differ because the agreements differ.”
 
 Use the draft calculation now; final billing follows the billing schedule. A draft is not evidence of payment.
+
+![Coastal's draft invoice showing included outcomes, discounted usage, prepaid consumption and the remaining amount due](docs/images/coastal-invoice.png)
+
+This sandbox snapshot includes earlier test outcomes; totals change as more events arrive.
 
 ## Run locally
 
