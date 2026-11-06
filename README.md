@@ -1,8 +1,8 @@
-# OrderAI: the same outcomes, different bills
+# Dunder Mifflin Order Desk: the same outcomes, different bills
 
 Outcome-based billing charges for an agreed result, such as a successfully processed order, rather than each attempt or API call. For AI services that complete work autonomously, this connects the bill to work the customer actually receives. It depends on a clear, measurable definition of success.
 
-This demo uses **OrderAI**, a fictional AI order-processing platform, and two fictional customers: **Harvest Distributors** and **Coastal Wholesale**. Both receive the same number of successful outcomes, but their contracts produce different charges. It shows how outcome metering works alongside negotiated rates, included allowances and prepaid balances.
+In this fictional demo, **Dunder Mifflin Order Desk** sells an AI order-processing service to office-supply distributors: **Northstar Office Supplies** and **Coastal Business Supplies**. It interprets incoming orders, matches paper, toner and stationery to a catalogue, and submits them to the distributor’s ERP. Both receive the same number of successful outcomes, but their contracts produce different charges. It shows how outcome metering works alongside negotiated rates, included allowances and prepaid balances.
 
 ## Demo flow
 
@@ -21,12 +21,12 @@ The application defines success and sends qualifying events. Metronome counts an
 Open **https://app.metronome.com/** and walk through the prepared setup:
 
 1. **Billable metric:** COUNT of `order.autonomously_processed`.
-2. **Harvest → contract → rate card:** platform subscription, included allowance and outcome tiers.
+2. **Northstar → contract → rate card:** platform subscription, included allowance and outcome tiers.
 3. **Coastal → contract:** outcome pricing override, then the prepaid commitment.
 
 All demo prices are **USD**:
 
-| Term | Harvest | Coastal |
+| Term | Northstar | Coastal |
 | --- | --- | --- |
 | Monthly platform, in arrears | $50 | $50 |
 | Included outcomes per month | First 2 | First 2 |
@@ -36,6 +36,8 @@ All demo prices are **USD**:
 Show Coastal's **20% discount through 28 October 2027**, then the commitment's **eligible product, access dates and remaining balance**. Earlier tests may already have consumed the credit.
 
 The event doesn't contain a price. The customer's contract determines the charge.
+
+The Metronome screenshots show the original sandbox labels: **Coastal Wholesale** corresponds to **Coastal Business Supplies**, and **OrderAI Platform** corresponds to **Dunder Mifflin Order Desk**. They illustrate the same contract terms.
 
 ![Coastal's platform subscription and fully consumed $1 prepaid commitment in Metronome](docs/images/coastal-contract.png)
 
@@ -88,6 +90,8 @@ Open **http://localhost:3000**. It starts in Offline rehearsal. If that port is 
    cp config/customer-target.example.json .data/coastal-target.json
    ```
 
-   Fill each file's `customerId`, `contractId` and shared `metricId`. Expected customer names: **Harvest Distributors** and **Coastal Wholesale**.
+   Fill each file's `customerId`, `contractId` and shared `metricId`. Customer names: **Northstar Office Supplies** and **Coastal Business Supplies**. The existing sandbox names **Harvest Distributors** and **Coastal Wholesale** are also accepted; keep the mapping filenames above when renaming customers.
+
+   To align the dashboards with this story, rename the existing sandbox customers (Harvest → Northstar Office Supplies; Coastal → Coastal Business Supplies) and the platform product (OrderAI Platform → Dunder Mifflin Order Desk). Keep the same customer, contract and metric IDs.
 
 4. Restart `npm start`. Select **Metronome sandbox** and use **Check counts** before running.

@@ -23,10 +23,10 @@ test('immediate outcomes exclude human intervention and ERP failure; replay reta
       assert.equal(r.delivery, 'fixture');
     }
   }
-  assert.equal(result.customers[0].orders[0].displayId, 'HV-1041');
-  assert.equal(result.customers[1].orders[0].displayId, 'CW-1041');
-  assert.equal(result.customers[0].events[0].event.properties.order_id, 'HV-1041');
-  assert.equal(result.customers[1].events[0].event.properties.order_id, 'CW-1041');
+  assert.equal(result.customers[0].orders[0].displayId, 'NS-1041');
+  assert.equal(result.customers[1].orders[0].displayId, 'CB-1041');
+  assert.equal(result.customers[0].events[0].event.properties.order_id, 'NS-1041');
+  assert.equal(result.customers[1].events[0].event.properties.order_id, 'CB-1041');
   result.customers[0].orders.forEach((harvest, i) => {
     const coastal = result.customers[1].orders[i];
     assert.notEqual(harvest.item, coastal.item);
@@ -39,13 +39,13 @@ test('immediate outcomes exclude human intervention and ERP failure; replay reta
   assert.deepEqual((await restarted.view()).customers, result.customers);
 }));
 
-test('sandbox uses separate verified contracts, durable identical timeout retries, and readonly counts', () => temporary(async dir => {
+for (const legacyNames of [false, true]) test(`sandbox verifies ${legacyNames ? 'legacy' : 'renamed'} customers, durable identical retries, and readonly counts`, () => temporary(async dir => {
   for (const c of CUSTOMERS) await writeFile(path.join(dir, `${c.key}-target.json`), JSON.stringify({ customerId: c.key, contractId: `${c.key}-contract`, metricId: 'outcomes' }));
   const env = { METRONOME_API_KEY: 'hidden-key', METRONOME_SANDBOX_CONFIRMED: 'true' };
   const calls = [];
   const api = async (endpoint, body, e) => {
     const key = e.METRONOME_CUSTOMER_ID;
-    if (endpoint.startsWith('/v1/customers/')) return { data: { name: CUSTOMERS.find(c => c.key === key).name } };
+    if (endpoint.startsWith('/v1/customers/')) return { data: { name: legacyNames ? { harvest: 'Harvest Distributors', coastal: 'Coastal Wholesale' }[key] : CUSTOMERS.find(c => c.key === key).name } };
     if (endpoint === '/v2/contracts/get') return { data: { id: `${key}-contract`, customer_id: key, rate_card_id: 'shared-card' } };
     assert.equal(endpoint, '/v1/ingest');
     calls.push(structuredClone(body));

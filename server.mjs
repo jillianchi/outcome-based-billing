@@ -51,4 +51,4 @@ export const server = http.createServer(async (req, res) => {
     send(res, 400, { error: error instanceof DemoError ? error.message : 'Unable to complete this action. Check the local demo configuration.' });
   }
 });
-server.listen(Number(process.env.PORT || 3000), '127.0.0.1', () => console.log(`OrderAI fictional demo · http://localhost:${server.address().port}`));
+server.listen(Number(process.env.PORT || 3000), '127.0.0.1', () => console.log(`Dunder Mifflin Order Desk fictional demo · http://localhost:${server.address().port}`));
