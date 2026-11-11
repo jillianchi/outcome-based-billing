@@ -39,13 +39,13 @@ test('immediate outcomes exclude human intervention and ERP failure; replay reta
   assert.deepEqual((await restarted.view()).customers, result.customers);
 }));
 
-for (const legacyNames of [false, true]) test(`sandbox verifies ${legacyNames ? 'legacy' : 'renamed'} customers, durable identical retries, and readonly counts`, () => temporary(async dir => {
+for (const names of ['renamed', 'legacy', 'sandbox']) test(`sandbox verifies ${names} customers, durable identical retries, and readonly counts`, () => temporary(async dir => {
   for (const c of CUSTOMERS) await writeFile(path.join(dir, `${c.key}-target.json`), JSON.stringify({ customerId: c.key, contractId: `${c.key}-contract`, metricId: 'outcomes' }));
   const env = { METRONOME_API_KEY: 'hidden-key', METRONOME_SANDBOX_CONFIRMED: 'true' };
   const calls = [];
   const api = async (endpoint, body, e) => {
     const key = e.METRONOME_CUSTOMER_ID;
-    if (endpoint.startsWith('/v1/customers/')) return { data: { name: legacyNames ? { harvest: 'Harvest Distributors', coastal: 'Coastal Wholesale' }[key] : CUSTOMERS.find(c => c.key === key).name } };
+    if (endpoint.startsWith('/v1/customers/')) return { data: { name: names === 'renamed' ? CUSTOMERS.find(c => c.key === key).name : { harvest: names === 'sandbox' ? 'Northstar Distributors' : 'Harvest Distributors', coastal: 'Coastal Wholesale' }[key] } };
     if (endpoint === '/v2/contracts/get') return { data: { id: `${key}-contract`, customer_id: key, rate_card_id: 'shared-card' } };
     assert.equal(endpoint, '/v1/ingest');
     calls.push(structuredClone(body));
