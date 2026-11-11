@@ -8,7 +8,7 @@ In this fictional demo, **Dunder Mifflin Order Desk** sells an AI order-processi
 
 ### 1. Local UI — introduce the business case
 
-Click **Replay batch**. Start with four empty quadrants: customer orders above, billing events below.
+Click **New batch**. Start with four empty quadrants: customer orders above, billing events below.
 
 We charge when an order is accepted by the ERP without human intervention. As the business grows, customers negotiate different rates and prepaid agreements. Counting outcomes is only the first part; contracts determine what those outcomes cost.
 
@@ -43,9 +43,11 @@ The Metronome screenshots show the original sandbox labels: **Coastal Wholesale*
 
 ### 3. Local UI — run the orders
 
-Select **Metronome sandbox**, click **Replay batch**, then **Run order batch**.
+Select **Metronome sandbox**, click **New batch**, then **Run order batch**.
 
 Each customer processes ten different orders, with matching results per line: **six successes, two human reviews and two ERP rejections**. Only successes emit billing events. Expand a terminal row to inspect its payload and customer-specific order ID.
+
+**New batch** clears the screen and prepares fresh events; **Run new batch** starts another run after completion. Each sandbox run adds six outcomes per customer. Previous batches are saved locally, and continuing an interrupted batch keeps its original event IDs to prevent double billing.
 
 **Offline rehearsal** runs the same sequence without sending events. Order processing itself is simulated in both modes.
 

@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtemp, rm, writeFile } from 'node:fs/promises';
+import { mkdtemp, rm, writeFile, readdir, readFile } from 'node:fs/promises';
 import path from 'node:path';
 import os from 'node:os';
 import { createBatchDemo, CUSTOMERS, ORDERS } from '../lib/batch-demo.mjs';
@@ -73,4 +73,56 @@ for (const names of ['renamed', 'legacy', 'sandbox']) test(`sandbox verifies ${n
   assert.ok(!JSON.stringify(state).includes('customer_id'));
   const older = createBatchDemo({ ...options, now: () => new Date('2027-01-01T00:00:00Z') });
   await assert.rejects(older.action({ mode: 'live', action: 'retry', customer: 'harvest', orderId: '1041' }), /earlier billing month/);
+}));
+
+
+test('fresh runs send new current-month events; interrupted runs keep IDs and previous batches are archived', () => temporary(async dir => {
+  for (const c of CUSTOMERS) await writeFile(path.join(dir, `${c.key}-target.json`), JSON.stringify({ customerId: c.key, contractId: `${c.key}-contract`, metricId: 'outcomes' }));
+  let clock = new Date('2026-10-30T06:00:00Z');
+  const calls = [];
+  const options = {
+    dir, env: { METRONOME_API_KEY: 'hidden-key', METRONOME_SANDBOX_CONFIRMED: 'true' }, now: () => clock,
+    api: async (endpoint, body, env) => {
+      const key = env.METRONOME_CUSTOMER_ID;
+      if (endpoint.startsWith('/v1/customers/')) return { data: { name: CUSTOMERS.find(c => c.key === key).name } };
+      if (endpoint === '/v2/contracts/get') return { data: { id: `${key}-contract`, customer_id: key, rate_card_id: 'card' } };
+      assert.equal(endpoint, '/v1/ingest'); calls.push(structuredClone(body[0]));
+    },
+  };
+  let demo = createBatchDemo(options);
+  for (let i = 0; i < 10; i++) await demo.action({ mode: 'live', action: 'next' });
+  const original = await readFile(path.join(dir, 'batch-live.json'), 'utf8');
+  await demo.action({ mode: 'live', action: 'replay' });
+  clock = new Date('2026-11-11T06:00:00Z');
+  demo = createBatchDemo(options);
+  const fresh = await demo.action({ mode: 'live', action: 'start' });
+  assert.deepEqual(fresh.customers.map(c => c.events.length), [0, 0]);
+  assert.equal(calls.length, 12, 'preparing a new batch sends nothing');
+  const archives = await readdir(path.join(dir, 'batch-history'));
+  assert.equal(archives.length, 1);
+  const archived = JSON.parse(await readFile(path.join(dir, 'batch-history', archives[0]), 'utf8'));
+  assert.deepEqual(archived.outbox, JSON.parse(original).outbox);
+  await demo.action({ mode: 'live', action: 'next' });
+  const partial = await demo.view('live');
+  demo = createBatchDemo(options);
+  assert.deepEqual(await demo.action({ mode: 'live', action: 'start' }), partial, 'continuation preserves events across restart');
+  const interrupted = JSON.parse(await readFile(path.join(dir, 'batch-live.json'), 'utf8'));
+  interrupted.completed = 0; // Crash after saving the first payloads, before recording progress.
+  await writeFile(path.join(dir, 'batch-live.json'), JSON.stringify(interrupted));
+  demo = createBatchDemo(options);
+  await demo.action({ mode: 'live', action: 'start' });
+  await demo.action({ mode: 'live', action: 'next' });
+  assert.equal(calls.length, 14, 'starting after a crash does not resend accepted first-order events');
+  for (let i = 1; i < 10; i++) await demo.action({ mode: 'live', action: 'next' });
+  assert.equal(calls.length, 24);
+  assert.equal(new Set(calls.map(e => e.transaction_id)).size, 24);
+  assert.ok(calls.slice(12).every(e => e.timestamp === clock.toISOString()));
+  const previous = calls.at(-2);
+  await demo.action({ mode: 'live', action: 'retry', customer: 'harvest', orderId: '1050' });
+  assert.deepEqual(calls.at(-1), previous, 'retry preserves the exact event');
+  const reset = await demo.action({ mode: 'live', action: 'new-batch' });
+  assert.equal(reset.completed, 0);
+  assert.equal(calls.length, 25, 'clearing the screen sends nothing');
+  await demo.action({ mode: 'live', action: 'next' });
+  assert.equal(new Set(calls.map(e => e.transaction_id)).size, 26);
 }));

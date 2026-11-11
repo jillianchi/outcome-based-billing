@@ -19,8 +19,8 @@ function render() {
   $('#mode').disabled = busy;
   $('#mode option[value="live"]').disabled = !state.sandboxAvailable;
   $('#mode-note').textContent = mode === 'fixture' ? 'OFFLINE REHEARSAL · Events stay on this computer. Nothing is sent to Metronome.' : `SANDBOX · Successful orders send real test events to Metronome. ${state.orders.filter(o => o.result === 'success').length} outcomes per customer. Existing monthly usage and prepaid consumption are retained.`;
-  $('#run').disabled = busy || state.completed === state.orders.length;
-  $('#run').innerHTML = busy ? 'Processing orders…' : state.completed === state.orders.length ? 'Batch complete ✓' : state.completed ? 'Continue batch →' : 'Run order batch →';
+  $('#run').disabled = busy;
+  $('#run').innerHTML = busy ? 'Processing orders…' : state.completed === state.orders.length ? 'Run new batch →' : state.completed ? 'Continue batch →' : 'Run order batch →';
   $('#replay').disabled = busy;
   $('#verify').disabled = busy || mode !== 'live';
   const openEvents = new Set([...document.querySelectorAll('details.event[open]')].map(row => row.dataset.eventId));
@@ -52,6 +52,7 @@ async function perform(fn) {
   finally { active = -1; busy = false; render(); }
 }
 $('#run').addEventListener('click', () => perform(async () => {
+  await request('start'); render();
   while (state.completed < state.orders.length) {
     active = state.completed;
     for (const text of (state.orders[active].result === 'human' ? ['Interpreting…', 'Matching catalog…'] : ['Interpreting…', 'Matching catalog…', 'Submitting to ERP…'])) { stage = text; render(); await sleep(600); }
@@ -59,7 +60,7 @@ $('#run').addEventListener('click', () => perform(async () => {
   }
 }));
 $('#replay').addEventListener('click', () => perform(async () => {
-  await request('replay');
+  await request('new-batch');
 }));
 $('#verify').addEventListener('click', () => perform(async () => { await request('verify'); }));
 $('#mode').addEventListener('change', async event => {
